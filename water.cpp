@@ -794,10 +794,10 @@ void* thread_func(void* data)
         set_opt(fd,9600,8,'N',1);
 
         printf("\n\n");
-        for(int j=0;j<=0;j++)
+        for(int j=0;j<=4;j++)
         {
             int value=0;
-            state_t state = ain_set_channel_gain(sd[0],j,0);
+            state_t state = ain_set_channel_gain(sd[0],2,0);
             value=ain_get_value(sd[0]);
             printf("ddddddddddddddddd%x  %d\n",value,j);
             serial_buff[0]=0x01;
