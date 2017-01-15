@@ -74,6 +74,9 @@ char LISTENPORT[6];
 int SLOTNUMBER;
 int changes_count;
 
+
+int number_for_test;
+
 /** 
  * @brief Main 主函数
  * 
@@ -145,7 +148,7 @@ int main(int argc, char *argv[])
 //            m_cts.m_ReturnClientPara.type = 0x08;
 //            printf("0---0:%d\n",Current.data[0].value[0].DValue);
 //            stime(&m_cts.m_ReturnClientPara.count);
-//            if(m_cts.m_ReturnClientPara.sc_polltime < SC_POLLTIME_MIN)
+//            if(m_cts.m_ReturnClientPara.sc//olltime < SC_POLLTIME_MIN)
 //                m_cts.m_ReturnClientPara.sc_polltime = SC_POLLTIME_MIN;
 //            interval.it_interval.tv_sec = m_cts.m_ReturnClientPara.sc_polltime;
 //            interval.it_interval.tv_usec = 0;
@@ -792,9 +795,10 @@ void* thread_func(void* data)
         int fd=0;
         fd=open_port(fd,1);
         set_opt(fd,9600,8,'N',1);
+        number_for_test++;
 
         printf("\n\n");
-        for(int j=0;j<=4;j++)
+        for(int j=0;j<=1;j++)
         {
             int value=0;
             state_t state = ain_set_channel_gain(sd[0],2,0);
@@ -803,24 +807,30 @@ void* thread_func(void* data)
             serial_buff[0]=0x01;
             serial_buff[1]=0x03;
             serial_buff[2]=0x02;
-            serial_buff[3]=value>>8;
-            serial_buff[4]=value;
+            serial_buff[3]=0;
+            serial_buff[4]=number_for_test;
             crc(5,serial_buff);
+            for(int i=0;i<=7;i++)
+            {
+                printf("%x",serial_buff[i]);
+                if(i==7)
+                    printf("\n");
+            }
             write(fd,serial_buff,7);
         }
         close(fd);
         printf("\n\n");
-        if(changes_count)
-        {
-            int s;
-            s = connectTCP(SERVERIP, SERVERPORT);
-            if(s > 0)
-            {
-                m_cts.m_Changes.time = time(NULL);
-                write(s,&m_cts.m_Changes,1 + sizeof(time_t) + changes_count * sizeof(struct Message));
-            }
-            close(s);
-        }
+     //   if(changes_count)
+      //  {
+       //     int s;
+        //    s = connectTCP(SERVERIP, SERVERPORT);
+         //   if(s > 0)
+          //  {
+           //     m_cts.m_Changes.time = time(NULL);
+            //    write(s,&m_cts.m_Changes,1 + sizeof(time_t) + changes_count * sizeof(struct Message));
+           // }
+           // close(s);
+        //}
 
         pthread_mutex_lock(&mutex);
         for(int i = 0;i < SLOTNUMBER;i++)
