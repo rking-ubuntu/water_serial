@@ -798,7 +798,7 @@ void* thread_func(void* data)
         number_for_test++;
 
         printf("\n\n");
-        for(int j=0;j<=1;j++)
+        for(int j=0;j<=5;j++)
         {
             int value=0;
             state_t state = ain_set_channel_gain(sd[0],2,0);
