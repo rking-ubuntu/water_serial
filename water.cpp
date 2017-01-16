@@ -19,6 +19,7 @@
 
 #include "serial_opt.h"
 #include "crc.h"
+#include "mcgs_serial.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -743,6 +744,7 @@ void PollSlot(Client_Data *p)
 void* thread_func(void* data)
 {
     Client_Data temp;
+    int value[5]={0};
     while(1)
     {
         pthread_mutex_lock(&flag);
@@ -789,37 +791,16 @@ void* thread_func(void* data)
         ///////////////////////////////////////////////////////////////////////////////
 
         changes_count = 0;
-
+        
         PollSlot(&temp);
-        unsigned char serial_buff[8];
-        int fd=0;
-        fd=open_port(fd,1);
-        set_opt(fd,9600,8,'N',1);
-        number_for_test++;
-
-        printf("\n\n");
-        for(int j=0;j<=5;j++)
+        for(int i=0;i<5;i++)
         {
-            int value=0;
-            state_t state = ain_set_channel_gain(sd[0],2,0);
-            value=ain_get_value(sd[0]);
-            printf("ddddddddddddddddd%x  %d\n",value,j);
-            serial_buff[0]=0x01;
-            serial_buff[1]=0x03;
-            serial_buff[2]=0x02;
-            serial_buff[3]=0;
-            serial_buff[4]=number_for_test;
-            crc(5,serial_buff);
-            for(int i=0;i<=7;i++)
-            {
-                printf("%x",serial_buff[i]);
-                if(i==7)
-                    printf("\n");
-            }
-            write(fd,serial_buff,7);
+            state_t state = ain_set_channel_gain(sd[0],i,0);
+            value[i]=ain_get_value(sd[0]);
         }
-        close(fd);
-        printf("\n\n");
+        mcgs_serial(5,value);
+        
+
      //   if(changes_count)
       //  {
        //     int s;
